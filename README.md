@@ -35,8 +35,8 @@ filenames = []
 for filename in os.listdir(html_dir_path):
     # CHECK IF THE FILE IS AN HTML FILE
     if filename.endswith('.html'):
-        # OPEN THE HTML FILE
-        with open(os.path.join(html_dir_path, filename), 'r') as file:
+        # OPEN THE HTML FILE WITH UTF-8 ENCODING
+        with open(os.path.join(html_dir_path, filename), 'r', encoding='utf-8') as file:
             # PARSE THE HTML USING BEAUTIFUL SOUP 4
             soup = BeautifulSoup(file.read(), 'html.parser')
             ##### BELOW YOU WILL ADD OR REMOVE TAGS YOU NEED FROM YOUR DIFFICULT HTML
@@ -55,10 +55,73 @@ for filename in os.listdir(html_dir_path):
             bodies.append(body)
             # ADD THE FILENAME TO THE LIST OF FILENAMES
             filenames.append(filename)
+            
+# WRITE THE EXTRACTED TITLES, BODIES, AND FILENAMES TO A CSV FILE WITH UTF-8 ENCODING
+with open(csv_file_name, 'w', newline='', encoding='utf-8') as file:
+    writer = csv.writer(file)
+    writer.writerow(['file', 'title', 'date', 'body'])
+    for filename, title, date, body in zip(filenames, dates, titles, bodies):
+        writer.writerow([filename, date, title, body])
 
-# WRITE THE EXTRACTED TITLES, BODIES, AND FILENAMES TO A CSV FILE
-with open(csv_file_name, 'w', newline='') as file:
+```
+## If you collect all the difficult URLs in a text file (urls.txt) with one url per line, Beautiful Soup 4 can download these first, and then scrape them.
+
+snip:
+```filename: auto-add-urls-then-scrape.py```
+```
+import os
+import csv
+import requests
+from bs4 import BeautifulSoup
+
+# Set the path of the directory to save the downloaded HTML files
+html_dir_path = '/Users/username/Downloads/html-to-scrape/'
+
+# Set the name of the output CSV file
+csv_file_name = 'output.csv'
+
+# Create a list to hold the extracted titles, bodies, and filenames
+titles = []
+dates = []
+bodies = []
+filenames = []
+
+# Read the list of URLs from the urls.txt file
+with open('urls.txt', 'r') as f:
+    urls = [url.strip() for url in f.readlines()]
+
+
+# LOOP THROUGH EACH FILE IN THE DIRECTORY
+for filename in os.listdir(html_dir_path):
+    # CHECK IF THE FILE IS AN HTML FILE
+    if filename.endswith('.html'):
+        # OPEN THE HTML FILE WITH UTF-8 ENCODING
+        with open(os.path.join(html_dir_path, filename), 'r', encoding='utf-8') as file:
+            # PARSE THE HTML USING BEAUTIFUL SOUP 4
+            soup = BeautifulSoup(file.read(), 'html.parser')
+            ##### BELOW YOU WILL ADD OR REMOVE TAGS YOU NEED FROM YOUR DIFFICULT HTML
+            # FIND THE TITLE TAG AND EXTRACT ITS TEXT
+            title = soup.title.text if soup.title else ''
+            ##### AND ADD WHAT GETS FOUND TO THE LIST OF HEADERS ABOVE
+            # ADD THE TITLE TO THE LIST OF TITLES
+            titles.append(title)
+            # FIND THE DATE TAG AND EXTRACT TEXT
+            date = soup.find('li', {'class': 'info_date'}).text.strip() if soup.find('li', {'class': 'info_date'}) else ''
+            # ADD THE TEXT FOUND IN THE DATE-RELATED TAG TO THE DATES LIST
+            dates.append(date)
+            # FIND THE DIV TAG WITH CLASS 'DOC_DESC' AND ID 'CONTENT', AND EXTRACT ITS TEXT
+            body text = soup.find('div', {'class': 'doc_desc', 'id': 'content'}).text.strip() if soup.find('div', {'class': 'doc_desc', 'id': 'content'}) else ''
+            # ADD THE BODY TO THE LIST OF BODIES
+            bodies.append(body)
+            # ADD THE FILENAME TO THE LIST OF FILENAMES
+            filenames.append(filename)
+            
+# WRITE THE EXTRACTED TITLES, BODIES, AND FILENAMES TO A CSV FILE WITH UTF-8 ENCODING
+with open(csv_file_name, 'w', newline='', encoding='utf-8') as file:
     writer = csv.writer(file)
     writer.writerow(['file', 'title', 'body'])
     for filename, title, date, body in zip(filenames, dates, titles, bodies):
         writer.writerow([filename, date, title, body])
+       
+```       
+------
