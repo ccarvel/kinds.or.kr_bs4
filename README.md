@@ -19,7 +19,7 @@ import csv
 from bs4 import BeautifulSoup
 
 ##### SET THIS PATH TO YOUR PARTICULAR DIRECTORY OF SAVED HTML FILES
-html_dir_path = '/Users/codycarvel/Downloads/html-to-scrape'
+html_dir_path = '/Users/username/Downloads/html-to-scrape'
 
 # SET THE NAME OF THE OUTPUT CSV FILE
 csv_file_name = 'output.csv'
